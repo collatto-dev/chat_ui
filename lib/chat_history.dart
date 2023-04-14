@@ -1,15 +1,14 @@
 import 'package:chat_ui/model/chat_history_model.dart';
-import 'package:chat_ui/model/chat_option.dart';
+import 'package:chat_ui/model/chat_history_options.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatHistory extends StatelessWidget {
 
-  const ChatHistory(
-      this.chatHistoryModel,
-      {
-        this.historyOption,
-        Key? key}): super(key: key);
+  const ChatHistory(this.chatHistoryModel, {
+    required this.historyOptions,
+    Key? key
+  }): super(key: key);
 
   static const double _borderRadius = 10;
   static const double _borderWidth = 1.0;
@@ -17,78 +16,66 @@ class ChatHistory extends StatelessWidget {
   static const _maxLines = 6;
 
   final ChatHistoryModel chatHistoryModel;
-  // final HistoryType? historyType;
-  final HistoryOption? historyOption;
+  final ChatHistoryOptions historyOptions;
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   // TODO:HistoryTypeでpadding, 色調整
-  //   return  Container(
-  //     alignment: FractionalOffset.centerRight,
-  //     padding: historyOption?.historyPadding ?? _createDefaultHistoryPadding(context),
-  //     child: _createNameAndHistoryField(context)
-  //   );
-  // }
   @override
   Widget build(BuildContext context) {
     // TODO:HistoryTypeでpadding, 色調整
-    debugPrint("ChatHistory build");
-    debugPrint("chatHistoryModel.history: ${chatHistoryModel.history}");
-    return  _createNameAndHistoryField(context);
+    return _createNameAndHistoryField(context);
   }
 
   Widget _createNameAndHistoryField(BuildContext context) {
+    final displaySize = MediaQuery.of(context).size;
     List<Widget> nameAndHistoryField = [];
     String? name = chatHistoryModel.name;
-    if (name == null) {
-      return _createHistoryField(context);
+    if (name == null || name.isEmpty) {
+      return _createHistoryField(displaySize);
     }
 
-    if (historyOption?.namePosition == NamePosition.top) {
-      nameAndHistoryField.add(_createNameField(context, name));
-      nameAndHistoryField.add(_createHistoryField(context));
-    } else {
-      nameAndHistoryField.add(_createHistoryField(context));
-      nameAndHistoryField.add(_createNameField(context, name));
+    if (historyOptions.namePosition == NamePosition.top) {
+      nameAndHistoryField.add(_createNameField(displaySize, name));
+      nameAndHistoryField.add(_createHistoryField(displaySize));
+    } else if (historyOptions.namePosition == NamePosition.bottom) {
+      nameAndHistoryField.add(_createHistoryField(displaySize));
+      nameAndHistoryField.add(_createNameField(displaySize, name));
     }
     return Column(children: nameAndHistoryField);
   }
 
-  Widget _createNameField(BuildContext context, String name) {
+  Widget _createNameField(Size displaySize, String name) {
     AlignmentGeometry alignment;
-    if (chatHistoryModel.historyType == HistoryType.partner) {
+    if (chatHistoryModel.historyPosition == HistoryPosition.left) {
       alignment = Alignment.centerLeft;
     } else {
       alignment = Alignment.centerRight;
     }
-    print("name: $name");
     return Container(
     alignment: alignment,
-      padding: _createDefaultNamePadding(context),
+      padding: _createDefaultNamePadding(displaySize),
       child: Text(name),
     );
   }
 
-  Widget _createHistoryField(BuildContext context) {
+  Widget _createHistoryField(Size displaySize) {
     return Container(
         alignment: FractionalOffset.centerRight,
-        padding: historyOption?.historyPadding ?? _createDefaultHistoryPadding(context),
+        padding: historyOptions.borderPadding ?? _createDefaultHistoryPadding(displaySize),
         child: TextField(
           controller: TextEditingController(text: chatHistoryModel.history),
           minLines: _minLines,
-          maxLines: _maxLines,
+          maxLines: historyOptions.maxLines ?? _maxLines,
           style: TextStyle(
-            fontSize: historyOption?.fontSize,
-            color: historyOption?.fontColor,
+            fontSize: historyOptions.fontSize,
+            color: historyOptions.fontColor,
           ),
           decoration: InputDecoration(
-            fillColor: historyOption?.backgroundColor,
+            fillColor: historyOptions.backgroundColor,
             filled: true,
             disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(historyOption?.borderRadius ?? _borderRadius),
+                borderRadius: BorderRadius.circular(historyOptions.borderRadius ?? _borderRadius),
                 borderSide: BorderSide(
-                    width: historyOption?.borderWidth ?? _borderWidth,
-                    color: historyOption?.borderColor ?? Colors.grey
+                    width: historyOptions.borderWidth ?? _borderWidth,
+                    color: historyOptions.borderColor ?? Colors.grey
                 )
             ),
           ),
@@ -97,19 +84,16 @@ class ChatHistory extends StatelessWidget {
     );
   }
 
-  EdgeInsetsGeometry _createDefaultNamePadding(BuildContext context) {
-    final displaySize = MediaQuery.of(context).size;
+  EdgeInsetsGeometry _createDefaultNamePadding(Size displaySize) {
     double topPadding = 0;
     double bottomPadding = 0;
-    if (chatHistoryModel.name != null &&
-        historyOption?.namePosition == NamePosition.top) {
+    if (chatHistoryModel.name == null || chatHistoryModel.name!.isEmpty) {
+      // NOP
+    } else if (historyOptions.namePosition == NamePosition.top) {
       topPadding = displaySize. height / 50;
-    } else if (chatHistoryModel.name != null &&
-        historyOption?.namePosition == NamePosition.bottom) {
+    } else if (historyOptions.namePosition == NamePosition.bottom) {
       bottomPadding = displaySize. height / 50;
     }
-    debugPrint("_createDefaultNamePadding topPadding: $topPadding, bottomPadding: $bottomPadding");
-
     return _createDefaultPadding(
         topPadding: topPadding,
         bottomPadding: bottomPadding,
@@ -117,20 +101,17 @@ class ChatHistory extends StatelessWidget {
         horizontalSmallPadding: displaySize.width / 50);
   }
 
-  EdgeInsetsGeometry _createDefaultHistoryPadding(BuildContext context) {
-    final displaySize = MediaQuery.of(context).size;
+  EdgeInsetsGeometry _createDefaultHistoryPadding(Size displaySize) {
     double topPadding = 0;
     double bottomPadding = 0;
-    if (chatHistoryModel.name == null) {
-      topPadding = displaySize. height / 50;
-      bottomPadding = displaySize. height / 50;
+    if (chatHistoryModel.name == null || chatHistoryModel.name!.isEmpty) {
+      topPadding = displaySize.height / 50;
+      bottomPadding = displaySize.height / 50;
+    } else if (historyOptions.namePosition == NamePosition.top) {
+      bottomPadding = displaySize.height / 50;
+    } else if (historyOptions.namePosition == NamePosition.bottom) {
+      topPadding = displaySize.height / 50;
     }
-    if (historyOption?.namePosition == NamePosition.top) {
-      bottomPadding = displaySize. height / 50;
-    } else if (historyOption?.namePosition == NamePosition.bottom) {
-      topPadding = displaySize. height / 50;
-    }
-    debugPrint("_createDefaultHistoryPadding topPadding: $topPadding, bottomPadding: $bottomPadding");
     return _createDefaultPadding(
         topPadding: topPadding,
         bottomPadding: bottomPadding,
@@ -144,7 +125,7 @@ class ChatHistory extends StatelessWidget {
     required double bottomPadding,
     required double horizontalBigPadding,
     required double horizontalSmallPadding,}) {
-    if (chatHistoryModel.historyType == HistoryType.partner) {
+    if (chatHistoryModel.historyPosition == HistoryPosition.left) {
       return EdgeInsets.fromLTRB(
           horizontalSmallPadding, topPadding,
           horizontalBigPadding, bottomPadding);
@@ -156,10 +137,12 @@ class ChatHistory extends StatelessWidget {
   }
 }
 
-enum HistoryType {
-  partner, user
+// 履歴の表示位置（左右）
+enum HistoryPosition {
+  left, right
 }
 
+// 履歴の投稿者名の表示位置（上下）
 enum NamePosition {
   top, bottom
 }

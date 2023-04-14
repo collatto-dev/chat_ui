@@ -1,26 +1,41 @@
-import 'dart:ui';
-
 import 'package:chat_ui/chat_history.dart';
-import 'package:json_annotation/json_annotation.dart';
 
-@JsonSerializable()
 class ChatHistoryModel {
 
   const ChatHistoryModel({
     this.history,
-    this.historyType,
-    this.name
+    this.historyPosition,
+    this.name,
+    this.datetime
   });
 
-  final String? history;
-  final HistoryType? historyType;
-  final String? name;
+  static const _keyHistory = "history";
+  static const _keyHistoryPosition = "history_position";
+  static const _keyName = "name";
+  static const _keyDatetime = "datetime";
 
-  // factory ChatHistoryModel.fromJson() => _$ChatHistoryModelFromJson(json);
-  // Map<String, dynamic> toJson => _$ChatHistoryModelToJson(this);
-  //
-  // ChatHistoryModel _$ChatHistoryModelFromJson => ChatHistoryModel();
-  // Map<String, dynamic> _$ChatHistoryModelToJson(ChatHistoryModel instance) => <String dynamic> {
-  //
-  // };
+  final String? history;
+  final HistoryPosition? historyPosition;
+  final String? name;
+  final String? datetime;
+
+  factory ChatHistoryModel.fromJson(Map<String, dynamic> json) {
+    return ChatHistoryModel(
+      history: json[_keyHistory],
+      historyPosition: json[_keyHistoryPosition],
+      name: json[_keyName],
+      datetime: json[_keyDatetime]
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    _keyHistory: history,
+    _keyHistoryPosition: historyPosition,
+    _keyName: name,
+    _keyDatetime: datetime
+  };
+
+  String toString() {
+    return "history: $history, historyPosition: $historyPosition, name: $name, datetime: $datetime";
+  }
 }

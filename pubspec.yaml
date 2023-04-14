@@ -11,8 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  hooks_riverpod: ^2.3.4
   json_serializable: ^6.6.1
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:
