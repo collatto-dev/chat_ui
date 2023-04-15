@@ -9,9 +9,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'model/room_data.dart';
+
 class ChatUi extends StatelessWidget {
 
   const ChatUi(this.chatHistoryModels, {
+    this.roomData,
     this.futureChatHistories,
     this.futureSendProcess,
     this.leftHistoryOptions,
@@ -20,6 +23,8 @@ class ChatUi extends StatelessWidget {
     Key? key
   }) : super(key: key);
 
+  // ルームの情報(ルーム名、チャット内のメンバー一覧、自身の名前)
+  final RoomData? roomData;
   final List<ChatHistoryModel> chatHistoryModels;
   final FutureChatHistories? futureChatHistories;
 
@@ -41,10 +46,10 @@ class ChatUi extends StatelessWidget {
   Widget _unionChatHistoriesAndChatField(List<ChatHistoryModel> chatHistories,
       BuildContext context) {
     debugPrint("_unionChatHistoriesAndChatField");
-    // final chatHistoryNotifier = ChatHistoriesNotifier(chatHistories);
     return ChangeNotifierProvider(
         create: (context) => ChatHistoriesNotifier(chatHistories),
-        child: ChatAndHistoryWidget(
+        child: _ChatAndHistoryWidget(
+          roomData: roomData,
           futureSendProcess: futureSendProcess,
           leftHistoryOptions: leftHistoryOptions,
           rightHistoryOptions: rightHistoryOptions,
@@ -54,9 +59,10 @@ class ChatUi extends StatelessWidget {
   }
 }
 
-class ChatAndHistoryWidget extends StatelessWidget {
+class _ChatAndHistoryWidget extends StatelessWidget {
 
-  const ChatAndHistoryWidget({
+  const _ChatAndHistoryWidget({
+    this.roomData,
     this.futureSendProcess,
     this.leftHistoryOptions,
     this.rightHistoryOptions,
@@ -64,6 +70,8 @@ class ChatAndHistoryWidget extends StatelessWidget {
     Key? key
   }) : super(key: key);
 
+  // ルームの情報(ルーム名、チャット内のメンバー一覧、自身の名前)
+  final RoomData? roomData;
   final FutureSendProcess? futureSendProcess;
   final ChatHistoryOptions? leftHistoryOptions;
   final ChatHistoryOptions? rightHistoryOptions;
@@ -71,18 +79,17 @@ class ChatAndHistoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final chatHistoryNotifier = Provider.of<ChatHistoriesNotifier>(context, listen: false);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _createChatHistories(context),
-        _createChatField(context),
+        _createChatHistories(chatHistoryNotifier),
+        _createChatField(chatHistoryNotifier),
       ],
     );
   }
 
-  // Widget _createChatHistories(ChatHistoriesNotifier chatHistoryNotifier) {
-  Widget _createChatHistories(BuildContext context) {
-    final chatHistoryNotifier = Provider.of<ChatHistoriesNotifier>(context, listen: false);
+  Widget _createChatHistories(ChatHistoriesNotifier chatHistoryNotifier) {
     return Consumer<ChatHistoriesNotifier>(
         builder: (context, messageNotifier, _) {
           return Expanded(
@@ -96,10 +103,9 @@ class ChatAndHistoryWidget extends StatelessWidget {
     );
   }
 
-  // Widget _createChatField(ChatHistoriesNotifier chatHistoryNotifier) {
-  Widget _createChatField(BuildContext context) {
-    final chatHistoryNotifier = Provider.of<ChatHistoriesNotifier>(context, listen: false);
+  Widget _createChatField(ChatHistoriesNotifier chatHistoryNotifier) {
     return ChatField(
+      myName: roomData?.myName,
       chatOptions: chatOption,
       onPressedSendButton: (chatHistoryModel) async {
         // 送信ボタン押したら、Serverにデータ送信・内部保存など、行いたい動作はユーザーによって異なる。
@@ -114,7 +120,6 @@ class ChatAndHistoryWidget extends StatelessWidget {
   }
 }
 
-
 // 非同期処理を任せたいのならこちら。
 //
 // Deprecated ChatUiAsynchronousProcessing.
@@ -123,6 +128,7 @@ class ChatAndHistoryWidget extends StatelessWidget {
 @deprecated
 class ChatUiAsynchronousProcessing extends StatelessWidget {
   const ChatUiAsynchronousProcessing(this.futureChatHistories, {
+    this.roomData,
     this.futureSendProcess,
     this.leftHistoryOptions,
     this.rightHistoryOptions,
@@ -130,6 +136,7 @@ class ChatUiAsynchronousProcessing extends StatelessWidget {
     Key? key
   }) : super(key: key);
 
+  final RoomData? roomData;
   final FutureChatHistories futureChatHistories;
   final FutureSendProcess? futureSendProcess;
   final ChatHistoryOptions? leftHistoryOptions;
@@ -145,6 +152,7 @@ class ChatUiAsynchronousProcessing extends StatelessWidget {
         builder: (context, histories) {
           if (histories.hasData && histories.connectionState == ConnectionState.done) {
             return ChatUi(histories.data!,
+                roomData: roomData,
                 futureSendProcess: futureSendProcess,
                 leftHistoryOptions: leftHistoryOptions,
                 rightHistoryOptions: rightHistoryOptions,

@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 class ChatField extends StatefulWidget {
 
   const ChatField({
+    this.myName,
     this.chatOptions,
     this.onPressedSendButton,
     Key? key
   }) : super(key: key);
 
+  final String? myName;
   final ChatHistoryOptions? chatOptions;
   final SendMessageCallBack? onPressedSendButton;
 
@@ -50,7 +52,8 @@ class _ChatFieldState extends State<ChatField> {
           FocusScope.of(context).unfocus();
           if (widget.onPressedSendButton != null) {
             widget.onPressedSendButton!(ChatHistoryModel(
-                history: _text, historyPosition: HistoryPosition.right
+                history: _text, historyPosition: HistoryPosition.right,
+                name: widget.myName
             ));
           }
           setState(() {

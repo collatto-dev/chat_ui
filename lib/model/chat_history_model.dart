@@ -9,10 +9,10 @@ class ChatHistoryModel {
     this.datetime
   });
 
-  static const _keyHistory = "history";
-  static const _keyHistoryPosition = "history_position";
-  static const _keyName = "name";
-  static const _keyDatetime = "datetime";
+  static const String _keyHistory = "history";
+  static const String _keyHistoryPosition = "history_position";
+  static const String _keyName = "name";
+  static const String _keyDatetime = "datetime";
 
   final String? history;
   final HistoryPosition? historyPosition;

@@ -1,6 +1,7 @@
 import 'package:chat_ui/chat_history.dart';
 import 'package:chat_ui/chat_ui.dart';
 import 'package:chat_ui/model/chat_history_options.dart';
+import 'package:chat_ui/model/room_data.dart';
 import 'package:example/stub.dart';
 import 'package:flutter/material.dart';
 
@@ -44,6 +45,10 @@ class _MyHomePageState extends State<MyHomePage> {
       body: ChatUi(
         //   FutureChatHistories()
         // Stub.getFutureChatHistories(),
+        roomData: RoomData(
+          roomName: "test_room",
+          myName: "ask_dayo"
+        ),
         Stub.getChatHistoryModels(),
         futureSendProcess: (chatHistoryModel, chatHistoryModels) {
           // chatHistoryModel.name = "ask";
