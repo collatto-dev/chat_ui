@@ -1,5 +1,5 @@
 import 'package:chat_ui/model/chat_history_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class ChatHistoriesNotifier extends ChangeNotifier {
 
@@ -9,13 +9,13 @@ class ChatHistoriesNotifier extends ChangeNotifier {
 
   void addChatHistoryModels(ChatHistoryModel chatHistoryModel) {
     _chatHistoryModels.add(chatHistoryModel);
-    debugPrint("chatHistoryModel: $chatHistoryModel");
+    // debugPrint("chatHistoryModel: $chatHistoryModel");
     notifyListeners();
   }
 
   void updateChatHistoryModels(List<ChatHistoryModel> chatHistoryModels) {
     _chatHistoryModels = chatHistoryModels;
-    debug(chatHistoryModels);
+    // debug(chatHistoryModels);
     // debugPrint("updateChatHistoryModels: $chatHistoryModels");
     notifyListeners();
   }

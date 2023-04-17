@@ -1,6 +1,5 @@
 import 'package:chat_ui/model/chat_history_model.dart';
 import 'package:chat_ui/model/chat_history_options.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatHistory extends StatelessWidget {
