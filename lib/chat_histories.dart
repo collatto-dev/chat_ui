@@ -23,13 +23,8 @@ class _ChatHistoriesState extends State<ChatHistories> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("ChatHistories build");
     // TODO: 後から履歴を追加しても、スクロール位置は維持する必用がある。
-    final scrollController = ScrollController(
-        initialScrollOffset: 100,
-        keepScrollOffset: true);
-    // debugPrint("scrollController.position.pixels: ${scrollController.position.pixels}");
-    // scrollController.attach(ScrollPosition())
+    final scrollController = ScrollController();
     return Container(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
       child: SingleChildScrollView(

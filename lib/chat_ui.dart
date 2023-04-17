@@ -39,13 +39,13 @@ class ChatUi extends StatelessWidget {
   // final loadingIndicator;
   @override
   Widget build(BuildContext context) {
-    debugPrint("ChatUi build");
+    // debugPrint("ChatUi build");
     return _unionChatHistoriesAndChatField(chatHistoryModels, context);
   }
 
   Widget _unionChatHistoriesAndChatField(List<ChatHistoryModel> chatHistories,
       BuildContext context) {
-    debugPrint("_unionChatHistoriesAndChatField");
+    // debugPrint("_unionChatHistoriesAndChatField");
     return ChangeNotifierProvider(
         create: (context) => ChatHistoriesNotifier(chatHistories),
         child: _ChatAndHistoryWidget(
@@ -146,7 +146,7 @@ class ChatUiAsynchronousProcessing extends StatelessWidget {
   // final loadingIndicator;
   @override
   Widget build(BuildContext context) {
-    debugPrint("ChatUi build");
+    // debugPrint("ChatUi build");
     return FutureBuilder(
         future: futureChatHistories.futureHistoryModels,
         builder: (context, histories) {

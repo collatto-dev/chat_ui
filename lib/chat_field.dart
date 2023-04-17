@@ -32,8 +32,8 @@ class _ChatFieldState extends State<ChatField> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Talk: build");
-    debugPrint("_text: $_text");
+    // debugPrint("Talk: build");
+    // debugPrint("_text: $_text");
     return Column(
         children: [
           _createSendButton(),
@@ -48,7 +48,7 @@ class _ChatFieldState extends State<ChatField> {
       child: ElevatedButton(
         onPressed: () async {
           // TODO: 入力したデータを送信
-          debugPrint("talkField.getText(): $_text");
+          // debugPrint("talkField.getText(): $_text");
           FocusScope.of(context).unfocus();
           if (widget.onPressedSendButton != null) {
             widget.onPressedSendButton!(ChatHistoryModel(
@@ -85,17 +85,17 @@ class _ChatFieldState extends State<ChatField> {
             focusedBorder: _createTextFieldDecoration(),
           ),
           onChanged: (text) {
-            debugPrint("onChanged: $text");
+            // debugPrint("onChanged: $text");
             _text = text;
           },
           onEditingComplete: () {
-            debugPrint("onEditingComplete");
+            // debugPrint("onEditingComplete");
           },
           onSubmitted: (text) {
-            debugPrint("onSubmitted: $text");
+            // debugPrint("onSubmitted: $text");
             FocusScope.of(context).unfocus();},
           onTapOutside: (text) {
-            debugPrint("onTapOutside: $text");
+            // debugPrint("onTapOutside: $text");
             FocusScope.of(context).unfocus();},
         )
     );

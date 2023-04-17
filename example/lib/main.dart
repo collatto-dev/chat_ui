@@ -37,61 +37,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    int _menuIndex = 0;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: ChatUi(
-        //   FutureChatHistories()
-        // Stub.getFutureChatHistories(),
         roomData: RoomData(
           roomName: "test_room",
-          myName: "ask_dayo"
+          myName: "test user"
         ),
         Stub.getChatHistoryModels(),
         futureSendProcess: (chatHistoryModel, chatHistoryModels) {
-          // chatHistoryModel.name = "ask";
           chatHistoryModels.add(chatHistoryModel);
           return Future.value(chatHistoryModels);
         },
         leftHistoryOptions: const ChatHistoryOptions(
-            namePosition: NamePosition.bottom
-          // fontSize: 30,
-          // borderRadius: 40,
-          // backgroundColor: Colors.blue,
-          // historyPadding: EdgeInsets.all(80)
+            namePosition: NamePosition.bottom,
         ),
         rightHistoryOptions: const ChatHistoryOptions(
-            namePosition: NamePosition.bottom
+            namePosition: NamePosition.bottom,
         ),
-        // chatOption: const ChatHistoryOptions(
-        //     namePosition: NamePosition.bottom,
-        //     fontSize: 30,
-        //     borderRadius: 40,
-        //     backgroundColor: Colors.blue,
-        //     borderPadding: EdgeInsets.all(80)
-        // )
       ),
-      // body: ChatUi(
-      //   Stub.getChatHistoryModels(),
-      //   futureSendProcess: (chatHistoryModel, chatHistoryModels) {
-      //     chatHistoryModels.add(chatHistoryModel);
-      //     return Future.value(chatHistoryModels);
-      //   },
-      // ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.ac_unit), label: "aaa"),
-          BottomNavigationBarItem(icon: Icon(Icons.ac_unit), label: "bbb"),
-        ],
-        currentIndex: _menuIndex,
-        onTap: (menuIndex) {
-          setState(() {
-            _menuIndex = menuIndex;
-          });
-        },
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
