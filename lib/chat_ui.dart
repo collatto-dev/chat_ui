@@ -5,7 +5,6 @@ import 'package:chat_ui/chat_field.dart';
 import 'package:chat_ui/chat_histories.dart';
 import 'package:chat_ui/model/chat_history_model.dart';
 import 'package:chat_ui/model/chat_history_options.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
