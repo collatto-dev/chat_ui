@@ -1,20 +1,23 @@
 import 'package:chat_ui/chat_history.dart';
 import 'package:chat_ui/model/chat_history_model.dart';
+import 'package:chat_ui/model/user_data.dart';
 import 'package:chat_ui/model/chat_history_options.dart';
 import 'package:flutter/material.dart';
 
 class ChatField extends StatefulWidget {
 
   const ChatField({
-    this.myName,
+    this.myUserData,
     this.chatOptions,
     this.onPressedSendButton,
+    this.allowSendingOfEmptyCharacters = false,
     Key? key
   }) : super(key: key);
 
-  final String? myName;
+  final UserData? myUserData;
   final ChatHistoryOptions? chatOptions;
   final SendMessageCallBack? onPressedSendButton;
+  final bool allowSendingOfEmptyCharacters;
 
   @override
   State<StatefulWidget> createState() => _ChatFieldState();
@@ -48,11 +51,16 @@ class _ChatFieldState extends State<ChatField> {
         onPressed: () async {
           // TODO: 入力したデータを送信
           // debugPrint("talkField.getText(): $_text");
+          if (_text.isEmpty && !widget.allowSendingOfEmptyCharacters) {
+            // 空文字の場合は送信許可しない条件なので、画面更新、送信ボタンの動作は行わない。
+            return;
+          }
+
           FocusScope.of(context).unfocus();
           if (widget.onPressedSendButton != null) {
             widget.onPressedSendButton!(ChatHistoryModel(
-                history: _text, historyPosition: HistoryPosition.right,
-                name: widget.myName
+                history: _text,
+                userData: widget.myUserData,
             ));
           }
           setState(() {

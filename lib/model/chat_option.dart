@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:chat_ui/chat_history.dart';
 import 'package:flutter/material.dart';
 

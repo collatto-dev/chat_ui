@@ -1,41 +1,55 @@
-import 'package:chat_ui/chat_history.dart';
+import 'package:chat_ui/model/user_data.dart';
 
 class ChatHistoryModel {
 
   const ChatHistoryModel({
     this.history,
-    this.historyPosition,
-    this.name,
-    this.datetime
+    this.userData,
+    this.timestamp
   });
-
   static const String _keyHistory = "history";
-  static const String _keyHistoryPosition = "history_position";
-  static const String _keyName = "name";
-  static const String _keyDatetime = "datetime";
+  static const String _keyUserData = "user_data";
+  static const String _keyTimestamp = "timestamp";
 
   final String? history;
-  final HistoryPosition? historyPosition;
-  final String? name;
-  final String? datetime;
+  final UserData? userData;
+  final DateTime? timestamp;
 
   factory ChatHistoryModel.fromJson(Map<String, dynamic> json) {
+    print("ask_log: UserData.fromJson(json): ${UserData.fromJson(json).userName}");
     return ChatHistoryModel(
       history: json[_keyHistory],
-      historyPosition: json[_keyHistoryPosition],
-      name: json[_keyName],
-      datetime: json[_keyDatetime]
+      userData: UserData.fromJson(json[_keyUserData]),
+      timestamp: _toDateTime(json)
     );
   }
 
   Map<String, dynamic> toJson() => {
     _keyHistory: history,
-    _keyHistoryPosition: historyPosition,
-    _keyName: name,
-    _keyDatetime: datetime
+    _keyUserData: userData?.toJson(),
+    _keyTimestamp: timestamp?.toString()
   };
 
+  static DateTime? _toDateTime(Map<String, dynamic>? json) {
+    final dateTimeStr = json?[_keyTimestamp];
+    if (dateTimeStr == null) {
+      return null;
+    }
+    try {
+      return DateTime.parse(dateTimeStr);
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
   String toString() {
-    return "history: $history, historyPosition: $historyPosition, name: $name, datetime: $datetime";
+    return "$_keyHistory: $history "
+        "$_keyUserData: $userData, $_keyTimestamp: $timestamp";
+  }
+
+  String? getTimeStampStr() {
+    if (timestamp == null) return null;
+    timestamp!.toString();
   }
 }

@@ -5,6 +5,7 @@ import 'package:chat_ui/chat_field.dart';
 import 'package:chat_ui/chat_histories.dart';
 import 'package:chat_ui/model/chat_history_model.dart';
 import 'package:chat_ui/model/chat_history_options.dart';
+import 'package:chat_ui/model/user_data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,17 +14,18 @@ import 'model/room_data.dart';
 class ChatUi extends StatelessWidget {
 
   const ChatUi(this.chatHistoryModels, {
-    this.roomData,
+    this.myUserData,
     this.futureChatHistories,
     this.futureSendProcess,
     this.leftHistoryOptions,
     this.rightHistoryOptions,
     this.chatOption,
+    this.allowSendingOfEmptyCharacters = false,
     Key? key
   }) : super(key: key);
 
   // ルームの情報(ルーム名、チャット内のメンバー一覧、自身の名前)
-  final RoomData? roomData;
+  final UserData? myUserData;
   final List<ChatHistoryModel> chatHistoryModels;
   final FutureChatHistories? futureChatHistories;
 
@@ -34,8 +36,9 @@ class ChatUi extends StatelessWidget {
   final ChatHistoryOptions? leftHistoryOptions;
   final ChatHistoryOptions? rightHistoryOptions;
   final ChatHistoryOptions? chatOption;
+  // 空文字を送信するとチャット欄が荒れるため、空文字を送信対象にするかどうかはここで設定する
+  final bool allowSendingOfEmptyCharacters;
 
-  // final loadingIndicator;
   @override
   Widget build(BuildContext context) {
     // debugPrint("ChatUi build");
@@ -45,14 +48,17 @@ class ChatUi extends StatelessWidget {
   Widget _unionChatHistoriesAndChatField(List<ChatHistoryModel> chatHistories,
       BuildContext context) {
     // debugPrint("_unionChatHistoriesAndChatField");
+    // List<ChatHistoryModel>packageUserChatAndHistoryModels =
     return ChangeNotifierProvider(
         create: (context) => ChatHistoriesNotifier(chatHistories),
         child: _ChatAndHistoryWidget(
-          roomData: roomData,
+          [...chatHistoryModels],
+          myUserData: myUserData,
           futureSendProcess: futureSendProcess,
           leftHistoryOptions: leftHistoryOptions,
           rightHistoryOptions: rightHistoryOptions,
           chatOption: chatOption,
+          allowSendingOfEmptyCharacters: allowSendingOfEmptyCharacters,
         )
     );
   }
@@ -60,25 +66,41 @@ class ChatUi extends StatelessWidget {
 
 class _ChatAndHistoryWidget extends StatelessWidget {
 
-  const _ChatAndHistoryWidget({
-    this.roomData,
+  const _ChatAndHistoryWidget(this.packageUserChatAndHistoryModels, {
+    this.myUserData,
     this.futureSendProcess,
     this.leftHistoryOptions,
     this.rightHistoryOptions,
     this.chatOption,
+    this.allowSendingOfEmptyCharacters = false,
     Key? key
   }) : super(key: key);
 
   // ルームの情報(ルーム名、チャット内のメンバー一覧、自身の名前)
-  final RoomData? roomData;
+  final List<ChatHistoryModel> packageUserChatAndHistoryModels;
+  final UserData? myUserData;
   final FutureSendProcess? futureSendProcess;
   final ChatHistoryOptions? leftHistoryOptions;
   final ChatHistoryOptions? rightHistoryOptions;
   final ChatHistoryOptions? chatOption;
+  final bool allowSendingOfEmptyCharacters;
 
   @override
   Widget build(BuildContext context) {
     final chatHistoryNotifier = Provider.of<ChatHistoriesNotifier>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      // chat_uiのパッケージ呼び出し元で、非同期処理によりChatHistoryModelsを追加して再Buildした場合、
+      // chatHistoryNotifierの値は変更されず、パッケージ呼び出し元のChatHistoryModelsだけが更新される。
+      // そのため、chatHistoryNotifierの値と、パッケージ呼び出し元のChatHistoryModelsに差異が生じる。
+      // WidgetのBuild中にchatHistoryNotifierを更新することは出来ないため、
+      // Build完了後に、chatHistoryNotifierの値と、パッケージ呼び出し元のChatHistoryModelsのデータが
+      // 同一になるように、chatHistoryNotifierを更新し、画面の表示を反映させる。
+      print("_ChatAndHistoryWidgetState addPostFrameCallback");
+      if (packageUserChatAndHistoryModels.length != chatHistoryNotifier.getChatHistoryModels().length) {
+        print("tmpChatAndHistoryModels update");
+        chatHistoryNotifier.updateChatHistoryModels(packageUserChatAndHistoryModels);
+      }
+    });
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -93,6 +115,7 @@ class _ChatAndHistoryWidget extends StatelessWidget {
         builder: (context, messageNotifier, _) {
           return Expanded(
               child: ChatHistories(
+                myUserData: myUserData,
                 chatHistoryNotifier.getChatHistoryModels(),
                 leftHistoryOptions: leftHistoryOptions,
                 rightHistoryOptions: rightHistoryOptions,
@@ -104,12 +127,13 @@ class _ChatAndHistoryWidget extends StatelessWidget {
 
   Widget _createChatField(ChatHistoriesNotifier chatHistoryNotifier) {
     return ChatField(
-      myName: roomData?.myName,
+      myUserData: myUserData,
       chatOptions: chatOption,
       onPressedSendButton: (chatHistoryModel) async {
         // 送信ボタン押したら、Serverにデータ送信・内部保存など、行いたい動作はユーザーによって異なる。
         // よって処理は使用者に委ねて、画面更新に必要な履歴一覧をこちら側でもらう。
         if (futureSendProcess != null) {
+          packageUserChatAndHistoryModels.add(chatHistoryModel);
           final chatHistoryModels = await futureSendProcess!(
               chatHistoryModel, chatHistoryNotifier.getChatHistoryModels());
           chatHistoryNotifier.updateChatHistoryModels(chatHistoryModels);
@@ -127,20 +151,22 @@ class _ChatAndHistoryWidget extends StatelessWidget {
 @deprecated
 class ChatUiAsynchronousProcessing extends StatelessWidget {
   const ChatUiAsynchronousProcessing(this.futureChatHistories, {
-    this.roomData,
+    this.myUserData,
     this.futureSendProcess,
     this.leftHistoryOptions,
     this.rightHistoryOptions,
     this.chatOption,
+    this.allowSendingOfEmptyCharacters = false,
     Key? key
   }) : super(key: key);
 
-  final RoomData? roomData;
+  final UserData? myUserData;
   final FutureChatHistories futureChatHistories;
   final FutureSendProcess? futureSendProcess;
   final ChatHistoryOptions? leftHistoryOptions;
   final ChatHistoryOptions? rightHistoryOptions;
   final ChatHistoryOptions? chatOption;
+  final bool allowSendingOfEmptyCharacters;
 
   // final loadingIndicator;
   @override
@@ -151,7 +177,7 @@ class ChatUiAsynchronousProcessing extends StatelessWidget {
         builder: (context, histories) {
           if (histories.hasData && histories.connectionState == ConnectionState.done) {
             return ChatUi(histories.data!,
-                roomData: roomData,
+                myUserData: myUserData,
                 futureSendProcess: futureSendProcess,
                 leftHistoryOptions: leftHistoryOptions,
                 rightHistoryOptions: rightHistoryOptions,

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:chat_ui/chat_history.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +6,7 @@ class ChatHistoryOptions {
 
   const ChatHistoryOptions({
     // 履歴上で表示する名前の上下位置を指定する。
-    this.namePosition = NamePosition.top,
+    this.namePosition = NamePosition.bottom,
     this.fontSize,
     this.fontColor,
     this.maxLines,

@@ -5,7 +5,9 @@ class ChatHistoriesNotifier extends ChangeNotifier {
 
   List<ChatHistoryModel> _chatHistoryModels = [];
 
-  ChatHistoriesNotifier(this._chatHistoryModels);
+  ChatHistoriesNotifier(this._chatHistoryModels) {
+    print("ChatHistoriesNotifier constractor");
+  }
 
   void addChatHistoryModels(ChatHistoryModel chatHistoryModel) {
     _chatHistoryModels.add(chatHistoryModel);

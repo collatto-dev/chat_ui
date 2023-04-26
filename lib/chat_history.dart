@@ -6,6 +6,7 @@ class ChatHistory extends StatelessWidget {
 
   const ChatHistory(this.chatHistoryModel, {
     required this.historyOptions,
+    required this.historyPosition,
     Key? key
   }): super(key: key);
 
@@ -16,6 +17,7 @@ class ChatHistory extends StatelessWidget {
 
   final ChatHistoryModel chatHistoryModel;
   final ChatHistoryOptions historyOptions;
+  final HistoryPosition historyPosition;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class ChatHistory extends StatelessWidget {
   Widget _createNameAndHistoryField(BuildContext context) {
     final displaySize = MediaQuery.of(context).size;
     List<Widget> nameAndHistoryField = [];
-    String? name = chatHistoryModel.name;
+    String? name = chatHistoryModel.userData?.userName;
     if (name == null || name.isEmpty) {
       return _createHistoryField(displaySize);
     }
@@ -43,7 +45,7 @@ class ChatHistory extends StatelessWidget {
 
   Widget _createNameField(Size displaySize, String name) {
     AlignmentGeometry alignment;
-    if (chatHistoryModel.historyPosition == HistoryPosition.left) {
+    if (historyPosition == HistoryPosition.left) {
       alignment = Alignment.centerLeft;
     } else {
       alignment = Alignment.centerRight;
@@ -62,7 +64,7 @@ class ChatHistory extends StatelessWidget {
         child: TextField(
           controller: TextEditingController(text: chatHistoryModel.history),
           minLines: _minLines,
-          maxLines: historyOptions.maxLines ?? _maxLines,
+          maxLines: historyOptions.maxLines ?? null ,
           style: TextStyle(
             fontSize: historyOptions.fontSize,
             color: historyOptions.fontColor,
@@ -86,7 +88,7 @@ class ChatHistory extends StatelessWidget {
   EdgeInsetsGeometry _createDefaultNamePadding(Size displaySize) {
     double topPadding = 0;
     double bottomPadding = 0;
-    if (chatHistoryModel.name == null || chatHistoryModel.name!.isEmpty) {
+    if (chatHistoryModel.userData?.userName == null || chatHistoryModel.userData!.userName!.isEmpty) {
       // NOP
     } else if (historyOptions.namePosition == NamePosition.top) {
       topPadding = displaySize. height / 50;
@@ -103,7 +105,7 @@ class ChatHistory extends StatelessWidget {
   EdgeInsetsGeometry _createDefaultHistoryPadding(Size displaySize) {
     double topPadding = 0;
     double bottomPadding = 0;
-    if (chatHistoryModel.name == null || chatHistoryModel.name!.isEmpty) {
+    if (chatHistoryModel.userData?.userName == null || chatHistoryModel.userData!.userName!.isEmpty) {
       topPadding = displaySize.height / 50;
       bottomPadding = displaySize.height / 50;
     } else if (historyOptions.namePosition == NamePosition.top) {
@@ -124,7 +126,8 @@ class ChatHistory extends StatelessWidget {
     required double bottomPadding,
     required double horizontalBigPadding,
     required double horizontalSmallPadding,}) {
-    if (chatHistoryModel.historyPosition == HistoryPosition.left) {
+    // if (chatHistoryModel.historyPosition == HistoryPosition.left) {
+    if (historyPosition == HistoryPosition.left) {
       return EdgeInsets.fromLTRB(
           horizontalSmallPadding, topPadding,
           horizontalBigPadding, bottomPadding);
